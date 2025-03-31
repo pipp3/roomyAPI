@@ -4,6 +4,8 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger.js';
 
 import connectDB from './config/db.js';
 import session from 'express-session';
@@ -19,7 +21,7 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: process.env.CLIENT_URL || 'http://localhost:5000',
     credentials: true
 }));
 app.use(express.json());
@@ -40,13 +42,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Documentación Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Routes
 app.use('/api/reservas', reservaRoutes);
-app.use('/auth', AuthRoutes);
-
-// Start server
-app.get('/', (req, res) => {
-    res.send('Hello World');
-});
+app.use('/auth', AuthRoutes); // Ruta para OAuth2
 
 export default app;

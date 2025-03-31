@@ -2,6 +2,16 @@
 
 API REST para gestionar reservas de salas de reuniones. Desarrollada con Node.js, Express y MongoDB.
 
+> **Nota**: Esta es una versión básica de la API que se encuentra en desarrollo activo. Se continuarán agregando mejoras y características adicionales para hacerla más robusta y completa. Entre las mejoras planificadas se incluyen:
+> - Mejora en el sistema de roles y permisos
+> - Implementación de rate limiting
+> - Mejoras en la validación y sanitización de datos
+> - Implementación de caché
+> - Mejoras en el manejo de errores
+> - Logs más detallados
+> - Tests unitarios y de integración
+> - Y más...
+
 ## 🚀 Características
 
 - Autenticación con Google OAuth2
@@ -191,9 +201,6 @@ La documentación completa de la API está disponible en:
 http://localhost:5000/api-docs
 ```
 
-## 🔍 Testing
-
-Para ejecutar las pruebas:
 
 ```bash
 npm test
@@ -207,12 +214,3 @@ npm test
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
-## ✉️ Contacto
-
-Tu Nombre - [@tutwitter](https://twitter.com/tutwitter) - email@example.com
-
-Link del Proyecto: [https://github.com/tu-usuario/roomyApi](https://github.com/tu-usuario/roomyApi)
