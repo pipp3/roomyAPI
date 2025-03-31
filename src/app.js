@@ -1,6 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 
 import connectDB from './config/db.js';
@@ -9,12 +11,12 @@ import passport from 'passport';
 import './config/passport.js';
 import AuthRoutes from './routes/AuthRoutes.js';
 import reservaRoutes from './routes/ReservaRoutes.js';
-dotenv.config();
 
 // Conectar a la base de datos
 connectDB();
 
 const app = express();
+
 // Middlewares
 app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
@@ -22,6 +24,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+
+// Configuración de sesión
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -32,12 +36,14 @@ app.use(session({
         sameSite: 'lax'
     }
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
 app.use('/api/reservas', reservaRoutes);
 app.use('/auth', AuthRoutes);
+
 // Start server
 app.get('/', (req, res) => {
     res.send('Hello World');
