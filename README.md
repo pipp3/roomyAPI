@@ -12,6 +12,24 @@ API REST para gestionar reservas de salas de reuniones. Desarrollada con Node.js
 > - Tests unitarios y de integración
 > - Y más...
 
+## 🌐 URLs de la API
+
+La API está disponible en diferentes URLs según el entorno:
+
+### Desarrollo Local
+```
+http://localhost:5000
+```
+
+### Producción
+```
+https://api.tudominio.com
+```
+
+> **Importante**: Asegúrate de actualizar las URLs de redirección en la consola de Google Cloud Console para incluir tanto la URL de desarrollo como la de producción:
+> - http://localhost:5000/auth/google/callback
+> - https://api.tudominio.com/auth/google/callback
+
 ## 🚀 Características
 
 - Autenticación con Google OAuth2
