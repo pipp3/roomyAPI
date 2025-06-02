@@ -9,6 +9,9 @@ yarn-error.log*
 
 # Environment files
 .env
+.env.local
+.env.production
+env.example
 
 # Build and Coverage
 /dist
@@ -54,6 +57,20 @@ node_modules/
 
 # NPM
 package-lock.json
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
 
 # Misc
 *.swp

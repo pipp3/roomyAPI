@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: roomy-backend-prod
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/roomydb
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    networks:
+      - roomy-network
+
+  mongo:
+    image: mongo:6.0
+    container_name: roomy-db-prod
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - mongo_data_prod:/data/db
+    networks:
+      - roomy-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: roomy-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+    networks:
+      - roomy-network
+
+volumes:
+  mongo_data_prod:
+
+networks:
+  roomy-network:
+    driver: bridge 

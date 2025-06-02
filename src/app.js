@@ -21,7 +21,12 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5000',
+    origin: [
+        process.env.CLIENT_URL || 'http://localhost:3000',
+        `http://${process.env.VPS_IP}:3000`,
+        `http://${process.env.VPS_IP}:5000`,
+        'http://localhost:5000'
+    ],
     credentials: true
 }));
 app.use(express.json());
