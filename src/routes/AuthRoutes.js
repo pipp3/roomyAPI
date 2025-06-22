@@ -26,7 +26,8 @@
 
 import express from "express";
 import passport from "passport";
-import { authSuccess, authFailure, logout } from "../controllers/AuthController.js";
+import { authSuccess, authFailure, logout, getCurrentUser } from "../controllers/AuthController.js";
+import { verifyToken } from "../middlewares/AuthMiddleware.js";
 const router = express.Router();
 
 /**
@@ -120,5 +121,50 @@ router.get("/failure", authFailure);
  *                   example: Logout exitoso
  */
 router.get("/logout", logout);
+
+/**
+ * @swagger
+ * /auth/test:
+ *   get:
+ *     summary: Endpoint de prueba para verificar que el servidor funciona
+ *     tags: [Autenticación]
+ *     responses:
+ *       200:
+ *         description: Servidor funcionando correctamente
+ */
+router.get("/test", (req, res) => {
+    res.json({ message: "Servidor funcionando correctamente", timestamp: new Date().toISOString() });
+});
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Obtiene la información del usuario autenticado
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Información del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/Usuario'
+ *       401:
+ *         description: No autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No token provided
+ */
+router.get("/me", verifyToken, getCurrentUser);
 
 export default router;

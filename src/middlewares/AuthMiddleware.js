@@ -14,7 +14,8 @@ export const verifyToken = (req, res, next) => {
         req.user = {
             id: decoded.userId,
             email: decoded.email,
-            name: decoded.name
+            nombre: decoded.nombre,
+            avatar: decoded.avatar
         };
         next();
     } catch (error) {
