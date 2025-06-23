@@ -19,23 +19,45 @@ connectDB();
 
 const app = express();
 
-// Middlewares
+// Configuración mejorada de CORS
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    process.env.API_URL,
+    'http://localhost:3000',
+    'http://localhost:5000'
+].filter(Boolean); // Eliminar valores undefined/null
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true
+    origin: function (origin, callback) {
+        // Permitir requests sin origin (mobile apps, postman, etc.)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            callback(new Error('No permitido por CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie']
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
 // Configuración de sesión
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { 
         maxAge: 3600000, // 1 hora
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        httpOnly: true
     }
 }));
 

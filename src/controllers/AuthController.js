@@ -84,8 +84,9 @@ export const authSuccess = async (req, res) => {
         res.cookie('token', token, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 24*60*60*1000 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 24*60*60*1000, // 24 horas
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
         });
 
         // Redirigir al frontend sin el token en la URL por seguridad
@@ -114,7 +115,8 @@ export const logout = (req, res) => {
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
         });
         
         // Responder con éxito, sin redirigir
