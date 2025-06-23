@@ -6,11 +6,21 @@ dotenv.config();
 
 export const authSuccess = async (req, res) => {
     try {
+        console.log('🔍 AuthController - authSuccess llamado');
+        console.log('🔍 AuthController - req.user:', req.user);
+        console.log('🔍 AuthController - req.isAuthenticated():', req.isAuthenticated());
+        console.log('🔍 AuthController - req.session:', req.session);
+        
         const googleUser = req.user;
         console.log('Datos completos de Google:', JSON.stringify(googleUser, null, 2));
 
         if (!googleUser || !googleUser.id || !googleUser.emails || !googleUser.emails[0] || !googleUser.displayName) {
             console.error('Datos de Google incompletos:', googleUser);
+            console.error('🔍 Debug - googleUser existe:', !!googleUser);
+            console.error('🔍 Debug - googleUser.id:', googleUser?.id);
+            console.error('🔍 Debug - googleUser.emails:', googleUser?.emails);
+            console.error('🔍 Debug - googleUser.displayName:', googleUser?.displayName);
+            
             return res.status(400).json({
                 message: "Datos de Google incompletos",
                 error: "Faltan datos requeridos del usuario de Google"
