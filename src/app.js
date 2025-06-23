@@ -69,6 +69,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/reservas', reservaRoutes);
-app.use('/auth', AuthRoutes); // Ruta para OAuth2
+app.use('/api/auth', AuthRoutes); // Ruta para OAuth2 - CAMBIADO para incluir /api
 
 export default app;
