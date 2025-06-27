@@ -9,7 +9,7 @@ RUN apk add --no-cache bash
 
 # Copiar package.json e instalar dependencias
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --production
 
 # Copiar el resto del código fuente
 COPY . .
@@ -17,5 +17,5 @@ COPY . .
 # Exponer el puerto del servidor
 EXPOSE 5000
 
-# Comando para ejecutar la aplicación
-CMD ["npm", "run", "dev"]
+# Comando para ejecutar la aplicación en producción
+CMD ["npm", "start"]

@@ -13,7 +13,9 @@ services:
       - key: PORT
         value: 5000
       - key: CLIENT_URL
-        value: https://roomy.onrender.com
+        value: https://roomyapp.duckdns.org
+      - key: API_URL
+        value: https://roomyapp.duckdns.org
       - key: SESSION_SECRET
         sync: false
       - key: NODE_ENV
@@ -22,13 +24,9 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      - key: GOOGLE_REDIRECT_URI
-        value: https://roomy.onrender.com/auth/google/callback
       - key: JWT_SECRET
         sync: false
       - key: JWT_EXPIRES_IN
-        value: 1h
+        value: 24h
       - key: JWT_COOKIE_NAME
         value: token
-      - key: API_URL
-        value: https://roomy.onrender.com
