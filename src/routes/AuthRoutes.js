@@ -40,7 +40,10 @@ const router = express.Router();
  *       302:
  *         description: Redirecciona a Google para autenticación
  */
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", passport.authenticate("google", { 
+  scope: ["profile", "email"],
+  callbackURL: "/api/auth/google/callback"
+}));
 
 /**
  * @swagger
@@ -54,28 +57,11 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
  */
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
-  async (req, res) => {
-    // Aquí manejaremos directamente la respuesta en lugar de usar redirects
-    try {
-      const googleUser = req.user;
-      console.log('🔍 Callback directo - Usuario recibido:', googleUser?.id);
-      
-      if (!googleUser || !googleUser.id || !googleUser.emails || !googleUser.emails[0] || !googleUser.displayName) {
-        console.error('Datos de Google incompletos en callback:', googleUser);
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-        return res.redirect(`${clientUrl}/login?error=auth_error`);
-      }
-
-      // Llamar directamente a la lógica de authSuccess
-      await authSuccessLogic(req, res, googleUser);
-      
-    } catch (error) {
-      console.error('Error en callback directo:', error);
-      const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-      res.redirect(`${clientUrl}/login?error=auth_error`);
-    }
-  }
+  passport.authenticate("google", { 
+    failureRedirect: "/api/auth/failure",
+    session: false 
+  }),
+  authSuccessLogic // Usa tu función personalizada directamente
 );
 
 /**

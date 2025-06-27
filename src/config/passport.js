@@ -9,14 +9,11 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || `${process.env.API_URL || 'http://localhost:5000'}/api/auth/google/callback`,
-      scope: ['profile', 'email']
+      callbackURL: "https://roomyapp.duckdns.org/api/auth/google/callback",
+      proxy: true // Esto es crucial cuando estás detrás de Nginx
     },
     (accessToken, refreshToken, profile, done) => {
-      console.log('🔍 Passport - Perfil recibido de Google:', JSON.stringify(profile, null, 2));
-      console.log('🔍 Passport - ID:', profile.id);
-      console.log('🔍 Passport - Emails:', profile.emails);
-      console.log('🔍 Passport - DisplayName:', profile.displayName);
+      console.log('Perfil de Google:', profile);
       return done(null, profile);
     }
   )

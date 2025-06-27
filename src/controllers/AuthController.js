@@ -242,12 +242,12 @@ export const authSuccessLogic = async (req, res, googleUser) => {
 
         res.cookie('token', token, { 
             httpOnly: true, 
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 24*60*60*1000, // 24 horas
-            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : undefined
-        });
-
+            secure: true,
+            sameSite: 'none',
+            domain: '.roomyapp.duckdns.org', // Nota el punto al inicio para subdominios
+            maxAge: 24*60*60*1000,
+            path: '/'
+          });
         console.log('🎉 AuthSuccessLogic - Autenticación completada, redirigiendo al frontend');
 
         // Redirigir al frontend sin el token en la URL por seguridad
