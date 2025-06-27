@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://roomyapp.duckdns.org/api/auth/google/callback",
+      callbackURL: `${process.env.API_URL}/api/auth/google/callback`,
       proxy: true // Esto es crucial cuando estás detrás de Nginx
     },
     (accessToken, refreshToken, profile, done) => {

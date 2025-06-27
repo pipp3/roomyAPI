@@ -26,7 +26,7 @@
 
 import express from "express";
 import passport from "passport";
-import { authSuccess, authFailure, logout, getCurrentUser, authSuccessLogic } from "../controllers/AuthController.js";
+import { authSuccess, authFailure, logout, getCurrentUser } from "../controllers/AuthController.js";
 import { verifyToken } from "../middlewares/AuthMiddleware.js";
 const router = express.Router();
 
@@ -41,8 +41,7 @@ const router = express.Router();
  *         description: Redirecciona a Google para autenticación
  */
 router.get("/google", passport.authenticate("google", { 
-  scope: ["profile", "email"],
-  callbackURL: "/api/auth/google/callback"
+  scope: ["profile", "email"]
 }));
 
 /**
@@ -61,7 +60,7 @@ router.get(
     failureRedirect: "/api/auth/failure",
     session: false 
   }),
-  authSuccessLogic // Usa tu función personalizada directamente
+  authSuccess // Usar authSuccess que tiene la firma correcta (req, res)
 );
 
 /**
