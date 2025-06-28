@@ -1,12 +1,19 @@
 import Reserva from "../models/Reserva.js";
+import Usuario from "../models/Usuario.js";
 import mongoose from "mongoose";
 import { formatearFecha, formatearFechaToString } from "../utils/dateUtils.js";
 
 // Obtener todas las reservas
 export const obtenerReservas = async (req, res) => {
   try {
+    const { userId } = req.query;
+    
+    if (!userId) {
+      return res.status(400).json({ message: "userId es requerido" });
+    }
+    
     const reservas = await Reserva.find({
-      usuarioId: new mongoose.Types.ObjectId(req.user.id),
+      usuarioId: new mongoose.Types.ObjectId(userId),
     });
     // Formatear las fechas en la respuesta
     const reservasFormateadas = reservas.map((reserva) => ({
@@ -15,6 +22,7 @@ export const obtenerReservas = async (req, res) => {
     }));
     res.json(reservasFormateadas);
   } catch (error) {
+    console.error("Error al obtener reservas:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -22,12 +30,16 @@ export const obtenerReservas = async (req, res) => {
 export const actualizarReserva = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fecha, sala, horaInicio, horaFin } = req.body;
+    const { fecha, sala, horaInicio, horaFin, userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId es requerido" });
+    }
 
     // Buscar la reserva existente
     const reservaExistente = await Reserva.findOne({
       _id: id,
-      usuarioId: req.user.id,
+      usuarioId: new mongoose.Types.ObjectId(userId),
     });
 
     if (!reservaExistente) {
@@ -92,7 +104,7 @@ export const actualizarReserva = async (req, res) => {
     if (horaFin) camposActualizados.horaFin = horaFin;
 
     const reserva = await Reserva.findOneAndUpdate(
-      { _id: id, usuarioId: req.user.id },
+      { _id: id, usuarioId: new mongoose.Types.ObjectId(userId) },
       { $set: camposActualizados },
       { new: true }
     );
@@ -119,32 +131,43 @@ export const actualizarReserva = async (req, res) => {
 export const eliminarReserva = async (req, res) => {
   try {
     const { id } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: "userId es requerido" });
+    }
+
     const reserva = await Reserva.findOneAndDelete({
       _id: id,
-      usuarioId: req.user.id,
+      usuarioId: new mongoose.Types.ObjectId(userId),
     });
+    
     if (!reserva) {
       return res.status(404).json({ message: "Reserva no encontrada" });
     }
+    
     res.json({ message: "Reserva eliminada correctamente", reserva });
   } catch (error) {
-    res.status(500).json({ message: "Error al eliminar la reserva", error });
+    console.error("Error al eliminar la reserva:", error);
+    res.status(500).json({ message: "Error al eliminar la reserva", error: error.message });
   }
 };
+
 // Crear una nueva reserva
 export const crearReserva = async (req, res) => {
   try {
     console.log("Body recibido:", req.body);
-    const { fecha, sala, horaInicio, horaFin } = req.body;
-    console.log("Datos extraídos:", { fecha, sala, horaInicio, horaFin });
+    const { fecha, sala, horaInicio, horaFin, userId } = req.body;
+    console.log("Datos extraídos:", { fecha, sala, horaInicio, horaFin, userId });
 
     // Validar que todos los campos requeridos estén presentes
-    if (!fecha || !sala || !horaInicio || !horaFin) {
+    if (!fecha || !sala || !horaInicio || !horaFin || !userId) {
       console.log("Campos faltantes:", {
         fecha: !fecha,
         sala: !sala,
         horaInicio: !horaInicio,
         horaFin: !horaFin,
+        userId: !userId,
       });
       return res.status(400).json({
         message: "Todos los campos son requeridos",
@@ -153,6 +176,7 @@ export const crearReserva = async (req, res) => {
           sala: !sala,
           horaInicio: !horaInicio,
           horaFin: !horaFin,
+          userId: !userId,
         },
       });
     }
@@ -199,7 +223,7 @@ export const crearReserva = async (req, res) => {
 
     // Crear la reserva
     const nuevaReserva = new Reserva({
-      usuarioId: req.user.id,
+      usuarioId: new mongoose.Types.ObjectId(userId),
       fecha: fechaReserva,
       sala,
       horaInicio,
@@ -219,6 +243,7 @@ export const crearReserva = async (req, res) => {
       reserva: reservaFormateada,
     });
   } catch (error) {
+    console.error("Error al crear la reserva:", error);
     res.status(400).json({
       message: "Error al crear la reserva",
       error: error.message,
@@ -228,11 +253,24 @@ export const crearReserva = async (req, res) => {
 
 export const obtenerReservasPorUsuario = async (req, res) => {
   try {
-    const reservas = await Reserva.find({ usuarioId: req.user.id });
-    res.status(200).json(reservas);
+    const { userId } = req.query;
+    
+    if (!userId) {
+      return res.status(400).json({ message: "userId es requerido" });
+    }
+    
+    const reservas = await Reserva.find({ usuarioId: new mongoose.Types.ObjectId(userId) });
+    
+    // Formatear las fechas en la respuesta
+    const reservasFormateadas = reservas.map((reserva) => ({
+      ...reserva.toObject(),
+      fecha: formatearFechaToString(reserva.fecha),
+    }));
+    
+    res.status(200).json(reservasFormateadas);
   } catch (error) {
-    console.log("Error al obtener las reservas", error);
-    res.status(500).json({ message: "Error al obtener las reservas", error });
+    console.error("Error al obtener las reservas:", error);
+    res.status(500).json({ message: "Error al obtener las reservas", error: error.message });
   }
 };
 
@@ -320,6 +358,73 @@ export const obtenerDisponibilidadSala = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error al obtener la disponibilidad",
+      error: error.message,
+    });
+  }
+};
+
+// Obtener o crear usuario basado en datos de NextAuth
+export const obtenerOCrearUsuario = async (req, res) => {
+  try {
+    const { googleId, email, nombre, avatar } = req.query;
+    
+    if (!googleId || !email || !nombre) {
+      return res.status(400).json({ 
+        message: "googleId, email y nombre son requeridos",
+        received: { googleId, email, nombre, avatar }
+      });
+    }
+    
+    // Buscar usuario existente por googleId
+    let usuario = await Usuario.findOne({ googleId });
+    
+    if (!usuario) {
+      // Crear nuevo usuario
+      console.log('Creando nuevo usuario con datos:', { googleId, email, nombre, avatar });
+      usuario = await Usuario.create({
+        googleId,
+        email,
+        nombre,
+        avatar: avatar || null
+      });
+      console.log('Usuario creado:', usuario);
+    } else {
+      // Actualizar datos del usuario si es necesario
+      let needsUpdate = false;
+      
+      if (usuario.email !== email) {
+        usuario.email = email;
+        needsUpdate = true;
+      }
+      
+      if (usuario.nombre !== nombre) {
+        usuario.nombre = nombre;
+        needsUpdate = true;
+      }
+      
+      if (avatar && usuario.avatar !== avatar) {
+        usuario.avatar = avatar;
+        needsUpdate = true;
+      }
+      
+      if (needsUpdate) {
+        await usuario.save();
+        console.log('Usuario actualizado:', usuario);
+      }
+    }
+    
+    res.json({
+      userId: usuario._id,
+      googleId: usuario.googleId,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      avatar: usuario.avatar
+    });
+    
+  } catch (error) {
+    console.error("Error al obtener/crear usuario:", error);
+    res.status(500).json({
+      message: "Error al obtener/crear usuario",
       error: error.message,
     });
   }

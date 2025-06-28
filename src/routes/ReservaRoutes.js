@@ -35,8 +35,8 @@
  */
 
 import express from "express";
-import { obtenerReservas, crearReserva, actualizarReserva, eliminarReserva, obtenerReservasPorUsuario, obtenerDisponibilidadSala } from "../controllers/ReservaController.js";
-import { verifyToken } from "../middlewares/AuthMiddleware.js";
+import { obtenerReservas, crearReserva, actualizarReserva, eliminarReserva, obtenerReservasPorUsuario, obtenerDisponibilidadSala, obtenerOCrearUsuario } from "../controllers/ReservaController.js";
+import { extractUserInfo } from "../middlewares/NextAuthMiddleware.js";
 const router = express.Router();
 
 /**
@@ -59,7 +59,7 @@ const router = express.Router();
  *       401:
  *         description: No autorizado
  */
-router.get("/", verifyToken, obtenerReservas);
+router.get("/", extractUserInfo, obtenerReservas);
 
 /**
  * @swagger
@@ -87,7 +87,7 @@ router.get("/", verifyToken, obtenerReservas);
  *       401:
  *         description: No autorizado
  */
-router.post("/", verifyToken, crearReserva);
+router.post("/", extractUserInfo, crearReserva);
 
 /**
  * @swagger
@@ -124,7 +124,7 @@ router.post("/", verifyToken, crearReserva);
  *       404:
  *         description: Reserva no encontrada
  */
-router.put("/:id", verifyToken, actualizarReserva);
+router.put("/:id", extractUserInfo, actualizarReserva);
 
 /**
  * @swagger
@@ -149,7 +149,7 @@ router.put("/:id", verifyToken, actualizarReserva);
  *       404:
  *         description: Reserva no encontrada
  */
-router.delete("/:id", verifyToken, eliminarReserva);
+router.delete("/:id", extractUserInfo, eliminarReserva);
 
 /**
  * @swagger
@@ -171,7 +171,7 @@ router.delete("/:id", verifyToken, eliminarReserva);
  *       401:
  *         description: No autorizado
  */
-router.get("/mis-reservas", verifyToken, obtenerReservasPorUsuario);
+router.get("/mis-reservas", extractUserInfo, obtenerReservasPorUsuario);
 
 /**
  * @swagger
@@ -216,6 +216,26 @@ router.get("/mis-reservas", verifyToken, obtenerReservasPorUsuario);
  *       401:
  *         description: No autorizado
  */
-router.get("/disponibilidad", verifyToken, obtenerDisponibilidadSala);
+router.get("/disponibilidad", extractUserInfo, obtenerDisponibilidadSala);
+
+/**
+ * @swagger
+ * /api/reservas/obtener-usuario:
+ *   get:
+ *     summary: Obtiene o crea un usuario basado en los datos de NextAuth
+ *     tags: [Reservas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Usuario obtenido o creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Reserva'
+ *       401:
+ *         description: No autorizado
+ */
+router.get("/obtener-usuario", extractUserInfo, obtenerOCrearUsuario);
 
 export default router;
